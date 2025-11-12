@@ -1,0 +1,366 @@
+body {
+  background-color: #fffdf7;
+  font-family: "Arial, Helvetica, sans-serif";
+  margin: 0;
+  padding: 0;
+}
+
+.btn-group {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+button {
+  background-color: #f4f4f1;
+  border: none;
+  border-radius: 2px;
+  color: #959aa3;
+  padding: 10px 22px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button a:visited {
+  color: #959aa3;
+}
+
+a {
+  text-decoration: none;
+}
+
+button:hover {
+  background-color: #f2c84c;
+  color: #867228;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+button:hover a:visited {
+  color: #756522;
+}
+
+.card {
+  background-color: white;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 22px 40px;
+}
+
+/* Added professional styling for Database Handler page with proper layout */
+
+:root {
+  --primary-color: #6b7d5f;
+  --accent-color: #f4d35e;
+  --text-dark: #2c2c2c;
+  --text-light: #666666;
+  --border-color: #e0e0e0;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.handler-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+}
+
+.header-text p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-greeting {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: white;
+}
+
+.nav-tabs {
+  background-color: var(--primary-color);
+  display: flex;
+  gap: 0;
+  padding: 0 40px;
+  border-bottom: 3px solid var(--primary-color);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-tab {
+  padding: 16px 24px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-tab:hover {
+  color: white;
+}
+
+.nav-tab.active {
+  color: white;
+  border-bottom-color: var(--accent-color);
+}
+
+.login-btn {
+  margin-left: auto;
+  background-color: white;
+  color: var(--primary-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.login-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.main-container {
+  padding: 40px;
+  background-color: #fffdf7;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.data-card {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--card-shadow);
+}
+
+.data-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: #999;
+}
+
+.card-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.data-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.data-card p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.card-button {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: #333;
+  padding: 12px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.card-button:hover {
+  background-color: #f0c94e;
+  box-shadow: 0 2px 8px rgba(244, 211, 94, 0.3);
+}
+
+.recent-activities {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: var(--card-shadow);
+}
+
+.recent-activities h2 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.activities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activities-table thead {
+  background-color: #f9f9f9;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.activities-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activities-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.activities-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.inactive {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.action-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.action-link:hover {
+  color: #f0c94e;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .handler-header {
+    padding: 16px 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-tabs {
+    padding: 0 20px;
+    flex-wrap: wrap;
+  }
+
+  .login-btn {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .main-container {
+    padding: 20px;
+  }
+
+  .recent-activities {
+    padding: 20px;
+  }
+
+  .activities-table {
+    font-size: 12px;
+  }
+
+  .activities-table th,
+  .activities-table td {
+    padding: 8px;
+  }
+}

@@ -1,0 +1,164 @@
+/* Handler page specific styles for data preparation cards and recent activities */
+
+.main-container {
+    padding: 40px;
+    background-color: #f5f5f5;
+  }
+  
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+  
+  .data-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .data-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #999;
+  }
+  
+  .card-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .data-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c2c2c;
+  }
+  
+  .data-card p {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.5;
+  }
+  
+  .card-button {
+    display: inline-block;
+    background-color: #f4d89f;
+    color: #333;
+    padding: 12px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .card-button:hover {
+    background-color: #f0c94e;
+    box-shadow: 0 2px 8px rgba(244, 211, 94, 0.3);
+  }
+  
+  .recent-activities {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .recent-activities h2 {
+    margin: 0 0 24px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c2c2c;
+  }
+  
+  .activities-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .activities-table thead {
+    background-color: #f9f9f9;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .activities-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .activities-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #2c2c2c;
+  }
+  
+  .activities-table tbody tr:hover {
+    background-color: #fafafa;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .status-badge.inactive {
+    background-color: #f0f0f0;
+    color: #666;
+  }
+  
+  .action-link {
+    color: #f4d89f;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .action-link:hover {
+    color: #f0c94e;
+  }
+  
+  @media (max-width: 768px) {
+    .cards-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  
+    .main-container {
+      padding: 20px;
+    }
+  
+    .recent-activities {
+      padding: 20px;
+    }
+  }
+  

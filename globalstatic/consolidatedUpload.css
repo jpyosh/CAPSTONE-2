@@ -1,0 +1,47 @@
+.main-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, 
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+}
+
+.highlight {
+    background-color: #ffe0e0;
+    color: #c00;
+    font-weight: bold;
+}
+
+footer.footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+}
