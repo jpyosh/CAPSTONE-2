@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'pages.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Results - Intramuros Administration</title>
+    <style>
+        .results-container { max-width: 95%; margin: 40px auto; padding: 0 30px; }
+        .results-header { background: white; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; width: 100%; max-width: 1200px; }
+        .results-title { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+        .results-subtitle { font-size: 16px; color: #666; margin-bottom: 20px; }
+        .stats-box { display: inline-block; background: #f4d89f; padding: 12px 24px; border-radius: 6px; font-size: 16px; font-weight: 600; color: #333; }
+        .table-container { background: white; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; overflow-x: auto; width: 100%; max-width: 1200px; }
+        .table-container table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .table-container table thead { background: #f4d89f; }
+        .table-container table th { padding: 14px 16px; text-align: left; font-weight: 600; color: #1a1a1a; font-size: 13px; }
+        .table-container table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s ease; }
+        .table-container table tbody tr:hover { background-color: #fafafa; }
+        .table-container table td { padding: 14px 16px; color: #555; }
+        .action-buttons { display: flex; gap: 15px; margin-top: 20px; }
+        .btn { padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s ease; border: none; }
+        .btn-primary { background: #f4d89f; color: #333; border: 1px solid #f4d89f; }
+        .btn-primary:hover { background: #f0c94e; border-color: #f0c94e; box-shadow: 0 2px 8px rgba(244,211,94,0.3); }
+        .btn-secondary { background: white; color: #333; border: 1px solid #ddd; }
+        .btn-secondary:hover { background: #f9f9f9; border-color: #bbb; }
+
+        /* Scroll Navigation Buttons */
+        .scroll-nav-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .scroll-nav-btn {
+            background-color: #6b7d5f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .scroll-nav-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-nav-btn:hover {
+            background-color: #5a6b50;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .scroll-nav-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .scroll-nav-btn i {
+            font-size: 16px;
+        }
+
+        /* Different colors for each button */
+        .scroll-top {
+            background-color: #6b7d5f;
+        }
+
+        .scroll-top:hover {
+            background-color: #5a6b50;
+        }
+
+        .scroll-middle {
+            background-color: #7d6b5f;
+        }
+
+        .scroll-middle:hover {
+            background-color: #6b5a50;
+        }
+
+        .scroll-bottom {
+            background-color: #5f6b7d;
+        }
+
+        .scroll-bottom:hover {
+            background-color: #505a6b;
+        }
+
+        @media (max-width: 768px) {
+            .scroll-nav-container {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .scroll-nav-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+            <div class="user-welcome">
+                Welcome, <strong>{{ user.username }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab active">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth">🚪 Logout</a>
+                {% else %}
+                <a href="/login" class="btn-header-auth">🔐 Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="results-container">
+        <div class="results-header">
+            <h2 class="results-title">Upload Results</h2>
+            <p class="results-subtitle">Data has been successfully processed and validated</p>
+            <div class="stats-box">
+                📊 Rows Kept: {{ totalInserted }}/{{ total }}
+            </div>
+            
+            <div class="action-buttons">
+                <a href="/" class="btn btn-secondary">← Back to Overview</a>
+                <a href="/analyzeData" class="btn btn-primary">Analyze Data →</a>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3 style="margin-bottom: 20px; font-size: 18px; font-weight: 600;">Uploaded Data Preview</h3>
+            {{ table|safe }}
+        </div>
+    </div>
+
+    <!-- Scroll Navigation Buttons -->
+    <div class="scroll-nav-container">
+        <button class="scroll-nav-btn scroll-top" id="scrollToTop">
+            ↑ Top
+        </button>
+        <button class="scroll-nav-btn scroll-middle" id="scrollToMiddle">
+            ↔ Middle
+        </button>
+        <button class="scroll-nav-btn scroll-bottom" id="scrollToBottom">
+            ↓ Bottom
+        </button>
+    </div>
+
+    <script>
+        // Get button elements
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        const scrollToMiddleBtn = document.getElementById('scrollToMiddle');
+        const scrollToBottomBtn = document.getElementById('scrollToBottom');
+
+        // Show/hide buttons based on scroll position
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.pageYOffset;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            // Show buttons after scrolling 300px
+            if (scrollPosition > 300) {
+                scrollToTopBtn.classList.add('show');
+                scrollToMiddleBtn.classList.add('show');
+                scrollToBottomBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+                scrollToMiddleBtn.classList.remove('show');
+                scrollToBottomBtn.classList.remove('show');
+            }
+        });
+
+        // Scroll to top
+        scrollToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll to middle
+        scrollToMiddleBtn.addEventListener('click', function() {
+            const documentHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const middlePosition = (documentHeight - windowHeight) / 2;
+            
+            window.scrollTo({
+                top: middlePosition,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll to bottom
+        scrollToBottomBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

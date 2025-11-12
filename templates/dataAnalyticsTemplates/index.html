@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+<link rel="manifest" href="{% static 'site.webmanifest' %}">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analyzer - Intramuros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'data-analyzer.css' %}">
+    
+    <style>
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .spinner-ring {
+            width: 100%;
+            height: 100%;
+            border: 6px solid #f0f0f0;
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .loading-message {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+            <div class="user-welcome">
+                Welcome, <strong>{{ user.username }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab active">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="form-wrapper">
+            <label class="form-label">Select Analysis Year</label>
+            
+            <form id="analyzerForm" action="{% url 'fillingCache' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="year-selector">
+                    <button type="button" class="year-nav-button" id="prevYear">‹</button>
+                    <div class="year-display" id="yearDisplay">{{ years|first }}</div>
+                    <button type="button" class="year-nav-button" id="nextYear">›</button>
+                </div>
+
+                <input type="hidden" id="chosenYear" name="chosenYear" value="{{ years|first }}">
+                
+                <button type="submit" class="proceed-button">Proceed</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+            </div>
+
+            <h2 class="loading-title">Processing Your Data</h2>
+            <p class="loading-message">
+                Please wait while we analyze your foot traffic data and generate predictions. This may take a few minutes.
+            </p>
+
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+
+    <script>
+        //functions for selecting a Year
+        const yearsRaw = [{% for year in years %}{{ year }},{% endfor %}];
+        const years = yearsRaw.filter(year => year !== '');
+        
+        let currentIndex = 0;
+        const yearDisplay = document.getElementById('yearDisplay');
+        const chosenYearInput = document.getElementById('chosenYear');
+        const prevButton = document.getElementById('prevYear');
+        const nextButton = document.getElementById('nextYear');
+
+        function updateYearDisplay() {
+            yearDisplay.textContent = years[currentIndex];
+            chosenYearInput.value = years[currentIndex];
+            prevButton.disabled = currentIndex === 0;
+            nextButton.disabled = currentIndex === years.length - 1;
+        }
+
+        prevButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateYearDisplay();
+            }
+        });
+
+        nextButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentIndex < years.length - 1) {
+                currentIndex++;
+                updateYearDisplay();
+            }
+        });
+
+        updateYearDisplay();
+
+        const form = document.getElementById('analyzerForm');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        form.addEventListener('submit', function() {
+            loadingOverlay.classList.add('active');
+        });
+    </script>
+</body>
+</html>

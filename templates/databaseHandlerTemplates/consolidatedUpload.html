@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{% static 'css/uploads.css' %}">
+</head>
+<body>
+    <div>
+        <form method="POST" action="{% url 'uploads' %}">
+            {% csrf_token %}
+            {{ form }}
+            <button>Submit</button>
+        </form>
+    </div>
+
+    <div>
+        <h3>Input Data</h3>
+        <form action="{% url 'loadData' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="fileSelect" accept="text/csv"> 
+            <br>
+            <input type="submit">
+        </form>
+    </div>
+
+    <div>
+        <h3>Input Ticket Data</h3>
+        <form action="{% url 'loadTicket' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="ticketSelect" accept="text/csv"> 
+            <br>
+            <input type="submit">
+        </form>
+    </div>
+
+    <div>
+        <h3>Input Closing Data</h3>
+        <form action="{% url 'loadClosing' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="closingSelect" accept="text/csv"> 
+            <br>
+            <input type="submit">
+        </form>
+    </div>
+
+    <!--  New Ticket Registration Data Section -->
+    <div class="main-container">
+        <h2 class="page-title">Ticket Registration Data</h2>
+        <p class="page-subtitle">Preview of uploaded ticket information.</p>
+        <div class="form-section">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>START_DATE</th>
+                        <th>END_DATE</th>
+                        <th>LOCATION</th>
+                        <th>PRICE_NORMAL</th>
+                        <th>PRICE_DISCOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        <td>{{ row.start_date }}</td>
+                        <td>{{ row.end_date }}</td>
+                        <td>{{ row.location }}</td>
+                        <td class="{% if row.price_normal == 0 %}highlight{% endif %}">{{ row.price_normal }}</td>
+                        <td class="{% if row.price_discount == 0 %}highlight{% endif %}">{{ row.price_discount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- End of new section -->
+
+    <div>
+        <table>
+            <tr>
+                <th>Batch ID</th>
+                <th>Table Modified</th>
+                <th>Upload Time</th>
+                <th>Uploader</th>
+                <th>Status</th>
+            </tr>
+            {% for batch in batches %}
+            <tr>
+                <td>{{ batch.id }}</td>
+                <td>{{ batch.type }}</td>
+                <td>{{ batch.time }}</td>
+                <td>{{ batch.uploader }}</td>
+                <td>{{ batch.presence }}</td>
+                <td><a href="{% url 'downloadStored' batch.id %}">File</a></td>
+                {% if batch.presence == 'inactive' %}
+                <td><a href="{% url 'viewPurge' batch.id %}">View Deletion</a></td>
+                {% else %}
+                <td><a onclick="return confirm('Are you sure you want to delete Batch {{batch.id}}?')" href="{% url 'purgeBatch' batch.id %}">Delete Rows</a></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <h3>Missing Data</h3>
+    <div>
+        <table>
+            <tr>
+                <th>Location</th>
+                <th>Missing Days</th>
+            </tr>
+            {% for location in missing %}
+            <tr>
+                <td>{{ location.name }}</td>
+                <td>{{ location.totalMissing }} missing days</td>
+                <td><a href="{% url 'missingDateFor' location.query.id %}">View Detailed</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

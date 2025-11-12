@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intramuros Foot Traffic Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <style>
+        /* Page indicators and current page display styling */
+        .dashboard-pages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .page-badge {
+            padding: 8px 14px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .page-badge:hover {
+            background: #e8e8e8;
+            border-color: #d0d0d0;
+        }
+
+        .page-badge.active {
+            background: #d4a942;
+            color: #1a1a1a;
+            border-color: #c59a35;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(212, 169, 66, 0.4);
+        }
+
+        .current-page-indicator {
+            background: #fafafa;
+            border-left: 4px solid #c59a35;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-page-indicator label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .current-page-indicator span {
+            color: #b8892e;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading-indicator.show {
+            display: block;
+        }
+
+        .iframe-container iframe {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .iframe-container iframe.loading {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+
+            <div class="user-welcome">
+                Welcome, <strong>{{ user }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="#" class="nav-tab active">Overview</a>
+                <a href="/handleData" class="nav-tab">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth login">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth logout">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- End of Header -->
+
+    <div class="main-container">
+        <div class="dashboard-panel">
+            <h3>Power BI Dashboard</h3>
+            
+            <!-- Page navigation badges -->
+            <div class="dashboard-pages" id="pageIndicators">
+                <div class="page-badge active" data-page-name="General" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=cd14a053105897a1617c">
+                    General
+                </div>
+                <div class="page-badge" data-page-name="Raw Numbers" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=da44850d2d65b2584472">
+                    Raw Numbers
+                </div>
+                <div class="page-badge" data-page-name="Demographic Analysis" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=677b5cdcc195780b232e">
+                    Demographic Analysis
+                </div>
+                <div class="page-badge" data-page-name="Weather Analysis" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=f579aaa0680916ea5472">
+                    Weather Analysis
+                </div>
+                <div class="page-badge" data-page-name="Ticket Analysis" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=1edf5811c271b0ea224a">
+                    Ticket Analysis
+                </div>
+                <div class="page-badge" data-page-name="Density Map" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=90f584b2c80045aa97d0">
+                    Density Map
+                </div>
+                <div class="page-badge" data-page-name="Activity Prediction" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=3a86d496a52cd9390b51">
+                    Activity Prediction
+                </div>
+                <div class="page-badge" data-page-name="Prediction Quality" data-page-url="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=4571c121c3c60d664660">
+                    Prediction Quality
+                </div>
+            </div>
+
+            <!-- Currently viewing indicator -->
+            <div class="current-page-indicator">
+                <label>Currently viewing:</label>
+                <span id="currentPageName">General</span>
+            </div>
+
+            <!-- Loading indicator -->
+            <div class="loading-indicator" id="loadingIndicator">
+                Loading page...
+            </div>
+
+            <!-- Power BI iframe -->
+            <div class="iframe-container">
+                <iframe 
+                    id="powerbiFrame"
+                    title="IAPowerBI" 
+                    src="https://app.fabric.microsoft.com/view?r=eyJrIjoiZDNhNTZhZmItNjc5MC00ZWIwLTg5ODYtMWM1NzdkZTcyZTIzIiwidCI6IjMwYmU0MGU3LWJlYWQtNGZmZS1hZTc5LThhOTBhMWFhYmUxMCIsImMiOjEwfQ%3D%3D&pageName=cd14a053105897a1617c" 
+                    allowFullScreen="true">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+
+    <script>
+        // Page navigation functionality
+        console.log('[v0] Initializing page navigation...');
+
+        const powerbiFrame = document.getElementById('powerbiFrame');
+        const currentPageNameEl = document.getElementById('currentPageName');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const pageBadges = document.querySelectorAll('.page-badge');
+
+        // Function to update the active page
+        function updateCurrentPageDisplay(pageName) {
+            console.log('[v0] Updating page display to:', pageName);
+            
+            // Update the "Currently viewing" text
+            currentPageNameEl.textContent = pageName;
+
+            // Update badge highlights
+            pageBadges.forEach(badge => {
+                const badgePageName = badge.getAttribute('data-page-name');
+                if (badgePageName === pageName) {
+                    badge.classList.add('active');
+                    console.log('[v0] Activated badge:', badgePageName);
+                } else {
+                    badge.classList.remove('active');
+                }
+            });
+        }
+
+        // Function to change the iframe source
+        function changePage(pageUrl, pageName) {
+            console.log('[v0] Changing to page:', pageName, 'URL:', pageUrl);
+            
+            // Show loading indicator
+            loadingIndicator.classList.add('show');
+            powerbiFrame.classList.add('loading');
+
+            // Update the iframe source
+            powerbiFrame.src = pageUrl;
+
+            // Update the current page display
+            updateCurrentPageDisplay(pageName);
+
+            // Hide loading indicator after iframe loads
+            powerbiFrame.onload = function() {
+                console.log('[v0] Page loaded successfully');
+                loadingIndicator.classList.remove('show');
+                powerbiFrame.classList.remove('loading');
+            };
+        }
+
+        // Add click event listeners to all page badges
+        pageBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                const pageName = this.getAttribute('data-page-name');
+                const pageUrl = this.getAttribute('data-page-url');
+                console.log('[v0] Badge clicked:', pageName);
+                changePage(pageUrl, pageName);
+            });
+        });
+
+        console.log('[v0] Page navigation initialized successfully');
+    </script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <!-- Added index.css for proper header styling and auth buttons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'pages.css' %}">
+    <link rel="stylesheet" href="{% static 'missing-dates.css' %}">
+    <link rel="stylesheet" href="{% static 'deletion-modal.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Validation & Rollback - Intramuros Administration</title>
+</head>
+<body>
+   <!-- Updated header structure to match index.html with header-nav and auth-buttons-header -->
+   <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+            <div class="user-welcome">
+                Welcome, <strong>{{ user.username }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab active">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <h2 class="page-title">Data Validation & Rollback</h2>
+        <p class="page-subtitle">Monitor missing data locations and batch upload history</p>
+
+        <!-- Missing Data by Location Section -->
+        <div class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Missing Data by Location</h2>
+                    <p class="section-subtitle">Locations with incomplete data records</p>
+                </div>
+            </div>
+
+            <!-- Added search box and export button -->
+            <div class="section-controls">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="locationSearch" placeholder="Search locations..." class="search-input">
+                </div>
+                <button class="export-btn">📥 Export Data</button>
+            </div>
+
+            {% if missing %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Missing Days</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="locationTableBody">
+                    {% for location in missing %}
+                    <tr class="location-row" data-location="{{ location.name|lower }}">
+                        <td>{{ location.name }}</td>
+                        <td>
+                            <span class="missing-count">{{ location.totalMissing }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'missingDateFor' location.query.id %}" class="action-link">
+                                View Detailed
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">✓</div>
+                <p>All locations have complete data</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Batch Upload History Section -->
+        <div class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Batch Upload History</h2>
+                    <p class="section-subtitle">Track all data uploads and their validation status</p>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="section-controls">
+                <div class="filter-group">
+                    <label for="monthYearFilter" style="margin-right: 8px; font-weight: 500;">Filter by Month/Year:</label>
+                    <select id="monthYearFilter" class="filter-select" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="">All Months</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="batchTypeSort" style="margin-right: 8px; font-weight: 500;">Sort by Date:</label>
+                    <select id="batchTypeSort" class="filter-select" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="">No Sort</option>
+                        <option value="desc">Newest First</option>
+                        <option value="asc">Oldest First</option>
+                    </select>
+                </div>
+            </div>
+
+            {% if batches %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Batch ID</th>
+                        <th>Batch Type</th>
+                        <th>Upload Time</th>
+                        <th>Uploader</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTableBody">
+                    {% for batch in batches %}
+                    <tr class="batch-row" data-batch-type="{{ batch.type }}" data-upload-time="{{ batch.time }}">
+                        <td><strong>#BCH-{{ batch.id }}</strong></td>
+                        <td>{{ batch.type }}</td>
+                        <td>{{ batch.time }}</td>
+                        <td>{{ batch.uploader }}</td>
+                        <td>
+                            {% if batch.presence == 'inactive' %}
+                                <span class="status-badge status-inactive">Inactive</span>
+                            {% else %}
+                                <span class="status-badge status-active">Active</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'downloadStored' batch.id %}" class="action-link">File Download</a>
+                            {% if batch.presence == 'inactive' %}
+                                | 
+                                <a href="#" onclick="openDeletionModal({{ batch.id }}); return false;" class="action-link">View Deletion</a>
+                            {% else %}
+                                | 
+                                <a onclick="return confirm('Are you sure you want to delete Batch {{batch.id}}? This action cannot be undone.')" 
+                                   href="{% url 'purgeBatch' batch.id %}" 
+                                   class="action-link">Delete Rows</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p>No batch uploads found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Deletion Info Modal -->
+    <div class="modal-overlay" id="deletionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <div class="modal-icon">🗑️</div>
+                    <h3 class="modal-title">Deletion Information</h3>
+                </div>
+                <button class="modal-close" onclick="closeDeletionModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="deletion-info" id="deletionInfoContent">
+                    <div class="loading-state">Loading deletion information...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-close" onclick="closeDeletionModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Location search functionality
+        document.getElementById('locationSearch').addEventListener('keyup', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.location-row');
+            
+            rows.forEach(row => {
+                const locationName = row.getAttribute('data-location');
+                if (locationName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Batch History Filter and Sort Functionality
+        const batchRows = document.querySelectorAll('.batch-row');
+        const monthYearFilter = document.getElementById('monthYearFilter');
+        const batchTypeSort = document.getElementById('batchTypeSort');
+
+        // Populate month/year filter options from existing data
+        function populateMonthYearFilter() {
+            const monthYearSet = new Set();
+            
+            batchRows.forEach(row => {
+                const uploadTime = row.getAttribute('data-upload-time');
+                if (uploadTime) {
+                    // Extract month and year from date string (e.g., "Oct. 23, 2025, 3:50 p.m.")
+                    const dateMatch = uploadTime.match(/([A-Za-z]+)\.\s+\d+,\s+(\d{4})/);
+                    if (dateMatch) {
+                        const month = dateMatch[1];
+                        const year = dateMatch[2];
+                        monthYearSet.add(`${month} ${year}`);
+                    }
+                }
+            });
+
+            // Sort and add options
+            const sortedMonthYears = Array.from(monthYearSet).sort((a, b) => {
+                const [monthA, yearA] = a.split(' ');
+                const [monthB, yearB] = b.split(' ');
+                const dateA = new Date(`${monthA} 1, ${yearA}`);
+                const dateB = new Date(`${monthB} 1, ${yearB}`);
+                return dateB - dateA; // Most recent first
+            });
+
+            sortedMonthYears.forEach(monthYear => {
+                const option = document.createElement('option');
+                option.value = monthYear;
+                option.textContent = monthYear;
+                monthYearFilter.appendChild(option);
+            });
+        }
+
+        // Filter by month/year
+        monthYearFilter.addEventListener('change', function() {
+            applyFiltersAndSort();
+        });
+
+        // Sort by batch type
+        batchTypeSort.addEventListener('change', function() {
+            applyFiltersAndSort();
+        });
+
+        function applyFiltersAndSort() {
+            const filterValue = monthYearFilter.value;
+            const sortValue = batchTypeSort.value;
+            const tbody = document.getElementById('batchTableBody');
+            let rowsArray = Array.from(batchRows);
+
+            // Sort ALL rows by date (if sort is selected)
+            if (sortValue) {
+                rowsArray.sort((a, b) => {
+                    const timeA = a.getAttribute('data-upload-time');
+                    const timeB = b.getAttribute('data-upload-time');
+                    
+                    // Parse date strings (e.g., "Oct. 23, 2025, 3:50 p.m.")
+                    const dateA = new Date(timeA.replace(/\./g, ''));
+                    const dateB = new Date(timeB.replace(/\./g, ''));
+                    
+                    if (sortValue === 'asc') {
+                        return dateA - dateB; // Oldest first
+                    } else if (sortValue === 'desc') {
+                        return dateB - dateA; // Newest first
+                    }
+                    return 0;
+                });
+            }
+
+            // Clear tbody and re-append all rows in sorted order
+            tbody.innerHTML = '';
+            rowsArray.forEach(row => {
+                tbody.appendChild(row);
+            });
+
+            // Then apply filter (show/hide)
+            rowsArray.forEach(row => {
+                const uploadTime = row.getAttribute('data-upload-time');
+                let showRow = true;
+
+                if (filterValue) {
+                    // Extract month and year from upload time for comparison
+                    const dateMatch = uploadTime.match(/([A-Za-z]+)\.\s+\d+,\s+(\d{4})/);
+                    if (dateMatch) {
+                        const rowMonthYear = `${dateMatch[1]} ${dateMatch[2]}`;
+                        showRow = rowMonthYear === filterValue;
+                    } else {
+                        showRow = false;
+                    }
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+
+        // Initialize on page load
+        populateMonthYearFilter();
+
+        // Modal Functions
+        function openDeletionModal(batchId) {
+            const modal = document.getElementById('deletionModal');
+            const content = document.getElementById('deletionInfoContent');
+            
+            // Show modal
+            modal.classList.add('active');
+            
+            // Show loading state
+            content.innerHTML = '<div class="loading-state" style="text-align: center; padding: 20px; color: #666;">Loading deletion information...</div>';
+            
+            // Fetch deletion information
+            fetch(`/handleData/viewDeletion/${batchId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        content.innerHTML = `
+                            <div class="info-section">
+                                <div class="info-label">Batch ID</div>
+                                <div class="info-value batch-id">#BCH-${data.batch_id}</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-label">Batch Type</div>
+                                <div class="info-value">${data.batch_type}</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-label">Deleted By</div>
+                                <div class="info-value user">${data.deleted_by}</div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <div class="info-label">Deletion Time</div>
+                                <div class="info-value timestamp">${data.deletion_time}</div>
+                            </div>
+                            
+                            <div class="alert-box">
+                                <div class="alert-box-title">Important Notice</div>
+                                <p class="alert-box-text">If the deleted data needs to be reviewed for analysis, please redownload the corresponding file by clicking the </br><u>File Download</u> link under <u>Actions</u>.</p>
+                            </div>
+                        `;
+                    } else {
+                        content.innerHTML = `
+                            <div class="alert-box" style="border-left-color: #dc3545; background: #f8d7da;">
+                                <div class="alert-box-title" style="color: #721c24;">⚠️ Error</div>
+                                <p class="alert-box-text" style="color: #721c24;">${data.error || 'Failed to load deletion information.'}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    content.innerHTML = `
+                        <div class="alert-box" style="border-left-color: #dc3545; background: #f8d7da;">
+                            <div class="alert-box-title" style="color: #721c24;">⚠️ Error</div>
+                            <p class="alert-box-text" style="color: #721c24;">Failed to fetch deletion information. Please try again.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function closeDeletionModal() {
+            const modal = document.getElementById('deletionModal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deletionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeletionModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeletionModal();
+            }
+        });
+    </script>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+        Back to Top
+    </button>
+
+    <script>
+        // Back to Top functionality
+        const backToTopBtn = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

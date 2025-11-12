@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register New Location - Intramuros Administration</title>
+    <!-- Added index.css for proper header styling and auth buttons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'pages.css' %}">
+</head>
+<body>
+    <!-- Updated header structure to match index.html with header-nav and auth-buttons-header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+            <div class="user-welcome">
+                Welcome, <strong>{{ user.username }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab active">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <h2 class="page-title">Register New Location</h2>
+        <p class="page-subtitle">Add new monitored areas or points of interest to the system.</p>
+
+        <div class="form-section">
+            <form method="POST" action="{% url 'newLoc' %}">
+                {% csrf_token %}
+
+                <!-- Location Name Abbreviated -->
+                <div class="form-group">
+                    <label for="id_location_name_abbreviated">Location Name Abbreviated</label>
+                    <input type="text" id="id_location_name_abbreviated" name="location_name_abbreviated" placeholder="e.g., PSL" value="{{ form.location_name_abbreviated.value|default:'' }}" required>
+                    {% if form.location_name_abbreviated.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.location_name_abbreviated.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Location Name Full -->
+                <div class="form-group">
+                    <label for="id_location_name_full">Location Name Full</label>
+                    <input type="text" id="id_location_name_full" name="location_name_full" placeholder="e.g., Plaza San Luis" value="{{ form.location_name_full.value|default:'' }}" required>
+                    {% if form.location_name_full.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.location_name_full.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <!-- Latitude and Longitude Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_location_latitude">Latitude</label>
+                        <input type="number" id="id_location_latitude" name="location_latitude" placeholder="e.g., 14.5994" step="0.0001" value="{{ form.location_latitude.value|default:'' }}" required>
+                        {% if form.location_latitude.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.location_latitude.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_location_longitude">Longitude</label>
+                        <input type="number" id="id_location_longitude" name="location_longitude" placeholder="e.g., 120.9842" step="0.0001" value="{{ form.location_longitude.value|default:'' }}" required>
+                        {% if form.location_longitude.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.location_longitude.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <a href="/handleData" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Register Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

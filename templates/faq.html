@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - Intramuros Foot Traffic Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <style>
+        .faq-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .faq-header h1 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .faq-header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .faq-section-title {
+            font-size: 1.8rem;
+            color: #c59a35;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #d4a942;
+        }
+
+        .faq-item {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: #d4a942;
+            box-shadow: 0 2px 8px rgba(212, 169, 66, 0.2);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            background: #fafafa;
+            transition: background 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: #f5f5f5;
+        }
+
+        .faq-question h3 {
+            font-size: 1.1rem;
+            color: #1a1a1a;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            color: #c59a35;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 25px;
+            background: #ffffff;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+            padding: 20px 25px;
+        }
+
+        .faq-answer p {
+            color: #444;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer ul, .faq-answer ol {
+            color: #444;
+            line-height: 1.8;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer li {
+            margin-bottom: 8px;
+        }
+
+        .faq-answer strong {
+            color: #1a1a1a;
+        }
+
+        .faq-answer code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c59a35;
+        }
+
+        .highlight-box {
+            background: #fff8e6;
+            border-left: 4px solid #d4a942;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box strong {
+            color: #c59a35;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #d4a942;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .faq-answer a {
+            transition: color 0.3s ease;
+        }
+
+        .faq-answer a:hover {
+            color: #8b6d28 !important;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header with navigation -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+
+            <div class="user-welcome">
+                Welcome, <strong>{{ user }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData/" class="nav-tab">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData/" class="nav-tab">Analyze Data</a>
+                <a href="/faq/" class="nav-tab active">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login/" class="btn-header-auth login">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout/" class="btn-header-auth logout">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- End of Header -->
+
+    <div class="faq-container">
+        <div class="faq-header">
+            <h1>Frequently Asked Questions</h1>
+            <p>Everything you need to know about navigating and using the Foot Traffic Analytics System</p>
+        </div>
+
+        <!-- Section 1: Getting Started -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Getting Started</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I log in to the system?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>To access the system:</p>
+                    <ol>
+                        <li>Navigate to the <a href="/login/" style="color: #c59a35; font-weight: 600;">login page</a> by clicking the <strong>Login</strong> button in the top-right corner</li>
+                        <li>Enter your authorized username and password</li>
+                        <li>Click <strong>Login</strong> to access the dashboard</li>
+                        <li>If you don't have credentials, you can register a new user under the <a href="/register/" style="color: #c59a35; font-weight: 600;">registration page</a></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What are the main sections of the system?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The system has five main sections accessible from the navigation menu:</p>
+                    <ul>
+                        <li><strong><a href="/" style="color: #c59a35; font-weight: 600;">Overview</a>:</strong> View Power BI dashboards with historical data and analytics</li>
+                        <li><strong><a href="/handleData/" style="color: #c59a35; font-weight: 600;">Upload Data</a>:</strong> Upload new foot traffic data files</li>
+                        <li><strong><a href="/handleData/missingLocationValues/" style="color: #c59a35; font-weight: 600;">Data Validation and Rollback</a>:</strong> Manage data quality and rollback if needed</li>
+                        <li><strong><a href="/analyzeData/" style="color: #c59a35; font-weight: 600;">Analyze Data</a>:</strong> Run predictive models and generate forecasts</li>
+                        <li><strong><a href="/faq/" style="color: #c59a35; font-weight: 600;">FAQs</a>:</strong> Access help documentation (this page)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Data Upload and Management -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Data Upload and Management</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I upload new foot traffic data?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Follow these steps to upload data:</p>
+                    <ol>
+                        <li>Click on <strong><a href="/handleData/" style="color: #c59a35; font-weight: 600;">Upload Data</a></strong> in the navigation menu</li>
+                        <li>Choose your CSV file containing foot traffic data</li>
+                        <li>Ensure your file follows the correct format (dates, locations, visitor counts)</li>
+                        <li>Click <strong>Upload</strong> and wait for validation</li>
+                        <li>Review any validation messages or errors</li>
+                        <li>Once successful, your data is stored in the database</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <strong>Important:</strong> Make sure your CSV file contains the required columns: Date, Location, Foreign, Domestic, Male, Female, Total Visitors.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What is the complete data ingestion workflow?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>To see your uploaded data reflected in the Power BI dashboards, follow this complete workflow:</p>
+                    
+                    <div class="highlight-box">
+                        <strong>Complete Data Ingestion Process:</strong>
+                    </div>
+
+                    <ol style="list-style-type: none; padding-left: 0;">
+                        <li>
+                            <span class="step-number">1</span>
+                            <strong>Upload Data to System</strong>
+                            <ul>
+                                <li>Go to <strong><a href="/handleData/" style="color: #c59a35; font-weight: 600;">Upload Data</a></strong> page</li>
+                                <li>Select your CSV file with foot traffic data</li>
+                                <li>Click <strong>Upload</strong> and wait for validation to complete</li>
+                                <li>Data is now stored in the PostgreSQL database</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <strong>Go to Power BI Website</strong>
+                            <ul>
+                                <li>Open <a href="https://app.fabric.microsoft.com/" target="_blank" style="color: #c59a35;">https://app.fabric.microsoft.com/</a> in your browser</li>
+                                <li>Log in with your Power BI/Microsoft Fabric account</li>
+                                <li>Navigate to your workspace containing the Intramuros dashboard</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <strong>Refresh the Dataset</strong>
+                            <ul>
+                                <li>Find the dataset connected to your PostgreSQL database</li>
+                                <li>Click on the <strong>Refresh</strong> button (circular arrow icon)</li>
+                                <li>Wait for the refresh to complete (this may take a few minutes)</li>
+                                <li>Power BI will fetch the new data from the database</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="step-number">4</span>
+                            <strong>Publish the Updated Report</strong>
+                            <ul>
+                                <li>After refresh completes, click <strong>Publish</strong></li>
+                                <li>Confirm the publication to update the embedded reports</li>
+                                <li>This updates the iframe links used in our web application</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="step-number">5</span>
+                            <strong>View Updated Dashboards</strong>
+                            <ul>
+                                <li>Return to the <strong><a href="/" style="color: #c59a35; font-weight: 600;">Overview</a></strong> page in our system</li>
+                                <li>Refresh your browser (F5 or Ctrl+R)</li>
+                                <li>Your newly uploaded data should now be visible in all dashboards</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="highlight-box">
+                        <strong>Note:</strong> The entire process typically takes 5-10 minutes depending on data volume. Power BI refresh is the longest step.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What should I do if data validation fails?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>If your data upload fails validation:</p>
+                    <ul>
+                        <li><strong>Check the error message:</strong> The system will tell you what's wrong</li>
+                        <li><strong>Common issues:</strong>
+                            <ul>
+                                <li>Missing required columns</li>
+                                <li>Incorrect date format (should be YYYY-MM-DD or DD/MM/YYYY)</li>
+                                <li>Non-numeric values in visitor count fields</li>
+                                <li>Invalid location abbreviations</li>
+                            </ul>
+                        </li>
+                        <li><strong>Fix your CSV file</strong> and try uploading again</li>
+                        <li><strong>Contact support</strong> if the error persists</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I check for missing dates or locations?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>To check data quality and completeness:</p>
+                    <ol>
+                        <li>Go to <strong><a href="/handleData/missingLocationValues/" style="color: #c59a35; font-weight: 600;">Data Validation and Rollback</a></strong> page</li>
+                        <li>The system will display:
+                            <ul>
+                                <li>Missing dates for each location</li>
+                                <li>Locations with incomplete data</li>
+                                <li>Batch upload history</li>
+                            </ul>
+                        </li>
+                        <li>You can view detailed reports on data gaps</li>
+                        <li>Use this information to fill in missing data</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Can I delete or rollback uploaded data?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, the system supports data rollback:</p>
+                    <ol>
+                        <li>Navigate to <strong><a href="/handleData/missingLocationValues/" style="color: #c59a35; font-weight: 600;">Data Validation and Rollback</a></strong></li>
+                        <li>View the list of batch uploads with timestamps</li>
+                        <li>Select the batch you want to remove</li>
+                        <li>Click <strong>Delete Batch</strong> (requires confirmation)</li>
+                        <li>All data from that batch will be removed from the database</li>
+                        <li>The deletion is tracked in the audit trail for compliance</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <strong>Warning:</strong> Batch deletion is permanent. Make sure you have backups before deleting data.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How can I verify the missing data count is correct?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>If you're unsure whether the system is correctly counting missing traffic dates, ticket records, or schedule data, you can verify the totals using the browser console:</p>
+                    <ol>
+                        <li>Navigate to the <strong><a href="/handleData/missingLocationValues/" style="color: #c59a35; font-weight: 600;">Data Validation and Rollback</a></strong> page</li>
+                        <li>Press <strong>F12</strong> on your keyboard to open Developer Tools</li>
+                        <li>Click on the <strong>Console</strong> tab</li>
+                        <li>In the console, you will see the sum of:
+                            <ul>
+                                <li><strong>Missing traffic dates</strong> for each location</li>
+                                <li><strong>Missing ticket records</strong> for locations</li>
+                                <li><strong>Missing schedule data</strong> for locations</li>
+                            </ul>
+                        </li>
+                        <li>Compare these console values with the displayed counts on the page</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <strong>Tip:</strong> The console provides real-time calculations directly from the data, ensuring transparency and accuracy of the missing data counts.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Using the Dashboard -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Using the Dashboard</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I navigate between different dashboard pages?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The <strong><a href="/" style="color: #c59a35; font-weight: 600;">Overview</a></strong> page has multiple dashboard views:</p>
+                    <ul>
+                        <li><strong>Click on the page badges</strong> at the top of the dashboard area</li>
+                        <li>Available pages include:
+                            <ul>
+                                <li><strong>General:</strong> Overall foot traffic overview</li>
+                                <li><strong>Raw Numbers:</strong> Detailed numeric data</li>
+                                <li><strong>Demographic Analysis:</strong> Gender and origin clustering</li>
+                                <li><strong>Weather Analysis:</strong> Weather impact on visitation</li>
+                                <li><strong>Ticket Analysis:</strong> Pricing and operating hours</li>
+                                <li><strong>Density Map:</strong> Geographic distribution</li>
+                                <li><strong>Activity Prediction:</strong> ARIMA forecasts</li>
+                                <li><strong>Prediction Quality:</strong> Model performance (MASE scores)</li>
+                            </ul>
+                        </li>
+                        <li>The active page is highlighted in <span style="color: #d4a942; font-weight: bold;">gold</span></li>
+                        <li>The "Currently viewing" indicator shows which page is loaded</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What information can I see on the dashboards?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The Power BI dashboards provide comprehensive analytics:</p>
+                    <ul>
+                        <li><strong>Historical Trends:</strong> Visitor patterns from 2018-2025</li>
+                        <li><strong>Demographics:</strong> Gender distribution (50.26% male, 47.81% female) and origin analysis (71.6% domestic, 17.36% international)</li>
+                        <li><strong>Site Comparisons:</strong> Performance across 18+ heritage sites</li>
+                        <li><strong>Weather Correlations:</strong> Impact of rainfall, temperature, and wind on visitation</li>
+                        <li><strong>Ticket Analysis:</strong> Pricing strategy effectiveness</li>
+                        <li><strong>Clustering Insights:</strong> K-Means clustering identifying visitor patterns</li>
+                        <li><strong>Geographic Maps:</strong> Spatial distribution of visitors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I interact with the Power BI visualizations?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Power BI dashboards are fully interactive:</p>
+                    <ul>
+                        <li><strong>Hover over charts:</strong> See detailed tooltips with exact values</li>
+                        <li><strong>Click on elements:</strong> Cross-filter other visualizations</li>
+                        <li><strong>Use slicers:</strong> Filter by year, quarter, location, etc.</li>
+                        <li><strong>Drill down:</strong> Click on data points to see more detail</li>
+                        <li><strong>Zoom:</strong> Use the map controls to zoom in/out on geographic views</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Predictive Analytics -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Predictive Analytics</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How do I run predictive analysis?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>To generate forecasts and predictions:</p>
+                    <ol>
+                        <li>Navigate to <strong><a href="/analyzeData/" style="color: #c59a35; font-weight: 600;">Analyze Data</a></strong> page</li>
+                        <li>Select the time range for analysis (recommendation: 2022-2025 for best accuracy)</li>
+                        <li>Click <strong>Run Analysis</strong></li>
+                        <li>Wait for the system to process (this may take several minutes)</li>
+                        <li>The system will:
+                            <ul>
+                                <li>Run ARIMA forecasting models for each location</li>
+                                <li>Perform K-Means clustering analysis</li>
+                                <li>Calculate performance metrics (MASE scores)</li>
+                                <li>Generate prescriptive recommendations</li>
+                            </ul>
+                        </li>
+                        <li>View results in the dashboard or data cube</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What predictive models does the system use?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The system employs multiple forecasting approaches:</p>
+                    <ul>
+                        <li><strong>ARIMA (Primary Model):</strong>
+                            <ul>
+                                <li>Grid search optimization (p, d, q parameters: 0-4)</li>
+                                <li>80/20 train-test split for validation</li>
+                                <li>7-month forecast horizon</li>
+                                <li>MASE < 1.0 acceptance threshold</li>
+                            </ul>
+                        </li>
+                        <li><strong>Exponential Smoothing (Fallback):</strong>
+                            <ul>
+                                <li>Simple Exponential Smoothing for stable patterns</li>
+                                <li>Double Exponential Smoothing (Holt's Method) for trends</li>
+                            </ul>
+                        </li>
+                        <li><strong>K-Means Clustering:</strong>
+                            <ul>
+                                <li>2 clustering models: Origin (domestic vs foreign), Gender (male vs female)</li>
+                                <li>Automatic cluster selection (2-10 clusters tested)</li>
+                                <li>Silhouette coefficient validation for optimal cluster count</li>
+                                <li>Additional data collection: Ticket Price analysis and Operating Duration analysis</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How accurate are the predictions?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Model performance varies by site and data quality:</p>
+                    <ul>
+                        <li><strong>Overall Performance:</strong> 94% of models achieve MASE < 1.0 (using 2022-2025 data)</li>
+                        <li><strong>Top Performers:</strong>
+                            <ul>
+                                <li>Plaza Roma: MASE 0.48 (excellent)</li>
+                                <li>Casa De Manila: MASE 0.63 (excellent)</li>
+                                <li>Pook Alitaptap: MASE 0.76 (very good)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Factors Affecting Accuracy:</strong>
+                            <ul>
+                                <li>Data completeness (gaps reduce accuracy)</li>
+                                <li>Special events (not captured by models)</li>
+                                <li>COVID-19 pandemic data (2020-2021 excluded)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Performance Metric:</strong> MASE (Mean Absolute Scaled Error) < 1.0 means the model performs better than a naive forecast.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What are prescriptive recommendations?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The system automatically generates actionable recommendations based on forecast trends:</p>
+                    <ul>
+                        <li><strong>Increasing Trend (≥ +10%):</strong>
+                            <ul>
+                                <li>Increase security personnel</li>
+                                <li>Advertise neighboring sites to distribute visitors</li>
+                                <li>Prevent overcrowding through visitor flow management</li>
+                            </ul>
+                        </li>
+                        <li><strong>Decreasing Trend (≤ -10%):</strong>
+                            <ul>
+                                <li>Advertise in nearby better-performing sites</li>
+                                <li>Investigate root causes of decline</li>
+                                <li>Consider promotional campaigns</li>
+                            </ul>
+                        </li>
+                        <li><strong>Stable Trend (-10% to +10%):</strong>
+                            <ul>
+                                <li>Maintain normal operations</li>
+                                <li>Continue current promotional strategies</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Technical Details -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Technical Details</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What technology stack powers this system?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The system is built on modern, robust technologies:</p>
+                    <ul>
+                        <li><strong>Backend:</strong> Django 5.2.7 (Python web framework)</li>
+                        <li><strong>Database:</strong> PostgreSQL (star schema architecture)</li>
+                        <li><strong>Analytics Libraries:</strong>
+                            <ul>
+                                <li>statsmodels 0.14.5 (ARIMA, Exponential Smoothing)</li>
+                                <li>scikit-learn 1.7.2 (K-Means clustering)</li>
+                                <li>sktime 0.39.0 (MASE calculation)</li>
+                                <li>pandas 2.3.3 (data manipulation)</li>
+                                <li>geopy 2.4.1 (geographic distance calculations)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Visualization:</strong>
+                            <ul>
+                                <li>Power BI / Microsoft Fabric (dashboards)</li>
+                                <li>Plotly 6.3.1 (interactive charts)</li>
+                            </ul>
+                        </li>
+                        <li><strong>External APIs:</strong> Meteostat (weather data)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What is the database architecture?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>The system uses a <strong>Star Schema</strong> data warehouse design:</p>
+                    <ul>
+                        <li><strong>Fact Table:</strong> FootTraffic_Fact (central metrics)</li>
+                        <li><strong>Dimension Tables (5 total):</strong>
+                            <ul>
+                                <li>Time_Dim: Year, Quarter, Month, Week, Day, Holidays</li>
+                                <li>Location_Dim: Site names, coordinates, abbreviations</li>
+                                <li>Ticket_Dim: Pricing by category</li>
+                                <li>Schedule_Dim: Operating hours</li>
+                                <li>Weather_Dim: Rainfall, temperature, wind speed</li>
+                            </ul>
+                        </li>
+                        <li><strong>Bridge Tables:</strong> Manage batch tracking and many-to-many relationships</li>
+                        <li><strong>Audit Trail:</strong> Tracks all data changes and deletions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Where does the weather data come from?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Weather data is integrated from external sources:</p>
+                    <ul>
+                        <li><strong>Data Source:</strong> Meteostat API</li>
+                        <li><strong>Location:</strong> 14.5833°N, 120.9833°E (Manila, Philippines)</li>
+                        <li><strong>Variables:</strong>
+                            <ul>
+                                <li>Rainfall (millimeters)</li>
+                                <li>Temperature (degrees Celsius)</li>
+                                <li>Wind speed (meters per second)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Impact Thresholds:</strong>
+                            <ul>
+                                <li>Rainfall > 20-30 mm: Significant visitor decline</li>
+                                <li>Temperature > 30°C: Gradual visitor decline</li>
+                                <li>Wind speed: Inconsistent impact on visitation</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Troubleshooting -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Troubleshooting</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>The dashboard is not loading or showing old data. What should I do?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Try these troubleshooting steps:</p>
+                    <ol>
+                        <li><strong>Refresh your browser:</strong> Press F5 or Ctrl+R (Cmd+R on Mac)</li>
+                        <li><strong>Clear browser cache:</strong> Hold Ctrl+Shift+Delete and clear cached images/files</li>
+                        <li><strong>Check Power BI refresh:</strong> Ensure the dataset was refreshed and published on Power BI website</li>
+                        <li><strong>Wait for processing:</strong> Large data uploads may take 5-10 minutes to appear</li>
+                        <li><strong>Check your internet connection</strong></li>
+                        <li><strong>Try a different browser</strong> (Chrome, Edge, Firefox recommended)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Analysis is taking too long. Is something wrong?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Predictive analysis can take time depending on data volume:</p>
+                    <ul>
+                        <li><strong>Normal processing time:</strong> 3-10 minutes for full analysis</li>
+                        <li><strong>What the system is doing:</strong>
+                            <ul>
+                                <li>Testing 125 ARIMA parameter combinations per site</li>
+                                <li>Running K-Means clustering with 2-10 cluster tests</li>
+                                <li>Calculating validation metrics (MASE, MAPE, MSPE, SMAPE)</li>
+                                <li>Generating prescriptive recommendations</li>
+                            </ul>
+                        </li>
+                        <li><strong>If it takes longer than 15 minutes:</strong> Check server status or contact support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Who do I contact for technical support?</h3>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>For technical assistance:</p>
+                    <ul>
+                        <li><strong>System Administrator:</strong> Contact your IT department</li>
+                        <li><strong>Data Issues:</strong> Reach out to the Intramuros Administration data team</li>
+                        <li><strong>Power BI Access:</strong> Contact your Microsoft Fabric administrator</li>
+                        <li><strong>Bug Reports:</strong> Document the issue with screenshots and steps to reproduce</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics</p>
+    </footer>
+
+    <script>
+        // FAQ accordion functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Close all other items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

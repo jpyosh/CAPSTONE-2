@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Closing Data - Intramuros Administration</title>
+    <!-- Added index.css for proper header styling and auth buttons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'pages.css' %}">
+</head>
+<body>
+    <!-- Updated header structure to match index.html with header-nav and auth-buttons-header -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+            <div class="user-welcome">
+                Welcome, <strong>{{ user.username }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab active">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <h2 class="page-title">Input Closing Data</h2>
+        <p class="page-subtitle">Upload CSV or Excel file with end-of-day closing information and daily summaries</p>
+
+        <div class="form-section">
+            <!-- Info Box -->
+            <div class="info-box">
+                <strong>What data is needed?</strong>
+                <p>Your file should be a CSV or XLSX containing the following columns:<br>
+                   LOCATION, START_DATE(YYYY-MM-DD format), END_DATE(YYYY-MM-DD format), MON_OPEN, MON_CLOSE, TUE_OPEN, TUE_CLOSE, WED_OPEN, WED_CLOSE, THURS_OPEN, THURS_CLOSE, FRI_OPEN, FRI_CLOSE, SAT_OPEN, SAT_CLOSE, SUN_OPEN, SUN_CLOSE</p>
+            </div>
+
+            <!-- Upload Form -->
+            <form action="{% url 'loadClosing' %}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+
+                <!-- Drag & Drop Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📋</div>
+                    <h3>Drag & drop your closing data file here</h3>
+                    <p>or click to browse</p>
+                    <small>Supports: CSV, XLSX (Max 10MB)</small>
+                    <input type="file" name="closingSelect" accept=".csv,.xlsx" class="file-input" id="fileInput">
+                </div>
+
+                <!-- File Input Group -->
+                <div class="form-group">
+                    <label for="closingSelect">Select File</label>
+                    <input type="file" name="closingSelect" accept=".csv,.xlsx" id="closingSelect" required>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <a href="/handleData" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit Closing Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const closingSelectInput = document.getElementById('closingSelect');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                closingSelectInput.files = files;
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                closingSelectInput.files = e.target.files;
+            }
+        });
+    </script>
+    <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

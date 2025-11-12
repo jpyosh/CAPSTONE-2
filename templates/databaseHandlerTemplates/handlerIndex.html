@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% load static %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+
+    {% load static %}
+    <!-- Added Inter font import to match Overview page -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <link rel="stylesheet" href="{% static 'handler.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Handler - Intramuros Administration</title>
+</head>
+<body>
+    <!-- Restructured header to match Overview page exactly -->
+    <!-- Header with navigation -->
+    <div class="header">
+        <div class="header-top">
+            <div class="header-left">
+                <img src="{% static 'images/IALOGO.png' %}" alt="Intramuros Logo" class="logo">
+                <div class="header-text">
+                    <h1>Intramuros Administration</h1>
+                    <p>Intelligent Foot Traffic Analysis System</p>
+                </div>
+            </div>
+
+            <!-- Enhanced user-welcome with better styling and padding -->
+            <div class="user-welcome">
+                Welcome, <strong>{{ user }}</strong>
+            </div>
+        </div>
+        <div class="header-nav">
+            <nav class="nav-tabs">
+                <a href="/" class="nav-tab">Overview</a>
+                <a href="/handleData" class="nav-tab active">Upload Data</a>
+                <a href="/handleData/missingLocationValues/" class="nav-tab">Data Validation and Rollback</a>
+                <a href="/analyzeData" class="nav-tab">Analyze Data</a>
+                <a href="/faq" class="nav-tab">FAQs</a>
+            </nav>
+            <div class="auth-buttons-header">
+                {% if not user.is_authenticated %}
+                <a href="/login" class="btn-header-auth login">🔐 Login</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="/logout" class="btn-header-auth logout">🚪 Logout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-container">
+        <!-- Converted buttons to professional card grid layout -->
+        <div class="cards-grid">
+            <!-- Register New Location Card -->
+            <div class="data-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </div>
+                <h3>Register New Location</h3>
+                <p>Add new monitored areas or points of interest to the system's database.</p>
+                <a href="{% url 'newLoc' %}" class="card-button">Register Location</a>
+            </div>
+
+            <!-- Input Foot Traffic Data Card -->
+            <div class="data-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <h3>Input Foot Traffic Data</h3>
+                <p>Manually enter or upload visitor counts and related metrics for specific locations.</p>
+                <a href="{% url 'dataRegistration' %}" class="card-button">Input Data</a>
+            </div>
+
+            <!-- Manage Entrance Tickets Card -->
+            <div class="data-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 5V3a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path>
+                    </svg>
+                </div>
+                <h3>Manage Entrance Tickets</h3>
+                <p>Update ticket types, pricing, and availability for various sites and events.</p>
+                <a href="{% url 'ticketRegistration' %}" class="card-button">Manage Tickets</a>
+            </div>
+
+            <!-- Input Closing Data Card -->
+            <div class="data-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <h3>Input Closing Data</h3>
+                <p>Record end-of-day closing information, final counts, and daily summaries for each location.</p>
+                <a href="{% url 'closingRegistration' %}" class="card-button">Input Closing Data</a>
+            </div>
+        </div>
+
+        <!-- Removed Recent Activities section -->
+    </div>
+     <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>

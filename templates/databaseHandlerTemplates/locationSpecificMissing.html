@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }} - Missing Data Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <!-- Added professional CSS styling -->
+    <link rel="stylesheet" href="{% static 'location-detail.css' %}">
+</head>
+<body>
+    <!-- Header -->
+    <div class="detail-header">
+        <div class="header-content">
+            <a href="{% url 'missingDates' %}" class="back-button" title="Back to locations">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="header-info">
+                <h1>{{ name }}</h1>
+                <p>Missing Data Analysis & Management</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-times"></i></div>
+                <div class="stat-label">Missing Traffic Dates</div>
+                <div class="stat-value" id="trafficTotal">
+                    {% if trafficmissing %}
+                        <script>
+                            let trafficSum = {% for month in trafficmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %};
+                            console.log('Traffic calculation:', '{% for month in trafficmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %}', '=', trafficSum);
+                            document.getElementById('trafficTotal').textContent = trafficSum;
+                        </script>
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                <div class="stat-label">Missing Ticket Records</div>
+                <div class="stat-value" id="ticketTotal">
+                    {% if ticketmissing %}
+                        <script>
+                            let ticketSum = {% for month in ticketmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %};
+                            console.log('Ticket calculation:', '{% for month in ticketmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %}', '=', ticketSum);
+                            document.getElementById('ticketTotal').textContent = ticketSum;
+                        </script>
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-label">Missing Schedule Data</div>
+                <div class="stat-value" id="scheduleTotal">
+                    {% if schedmissing %}
+                        <script>
+                            let scheduleSum = {% for month in schedmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %};
+                            console.log('Schedule calculation:', '{% for month in schedmissing %}{{ month.matching|length }}{% if not forloop.last %}+{% endif %}{% endfor %}', '=', scheduleSum);
+                            document.getElementById('scheduleTotal').textContent = scheduleSum;
+                        </script>
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Traffic Dates Section -->
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-chart-line section-icon"></i>
+                <div>
+                    <h2 class="section-title">Missing Traffic Dates</h2>
+                    <p class="section-subtitle">Dates without foot traffic data records</p>
+                </div>
+            </div>
+
+            {% if trafficmissing %}
+                <div class="months-container">
+                    {% for month_data in trafficmissing %}
+                        <div class="month-group">
+                            <div class="month-header" onclick="toggleMonth(this)">
+                                <div class="month-title">
+                                    <span class="month-count">{{ month_data.matching|length }}</span>&nbsp;<span class="month-name">{% if month_data.month == 1 %}January{% elif month_data.month == 2 %}February{% elif month_data.month == 3 %}March{% elif month_data.month == 4 %}April{% elif month_data.month == 5 %}May{% elif month_data.month == 6 %}June{% elif month_data.month == 7 %}July{% elif month_data.month == 8 %}August{% elif month_data.month == 9 %}September{% elif month_data.month == 10 %}October{% elif month_data.month == 11 %}November{% elif month_data.month == 12 %}December{% endif %} {{ month_data.year }}</span>
+                                </div>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div class="month-content">
+                                <div class="dates-list">
+                                    {% for date in month_data.matching %}
+                                        <div class="date-badge">{{ date }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="action-buttons">
+                                    <a href="{% url 'missingCSVDownload' name %}" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Download CSV
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-check-circle"></i></div>
+                    <p>All traffic dates are complete! No missing data.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Missing Ticket Records Section -->
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-receipt section-icon"></i>
+                <div>
+                    <h2 class="section-title">Missing Ticket Records</h2>
+                    <p class="section-subtitle">Dates without ticket pricing information</p>
+                </div>
+            </div>
+
+            {% if ticketmissing %}
+                <div class="months-container">
+                    {% for month_data in ticketmissing %}
+                        <div class="month-group">
+                            <div class="month-header" onclick="toggleMonth(this)">
+                                <div class="month-title">
+                                    <span class="month-count">{{ month_data.matching|length }}</span>&nbsp;<span class="month-name">{% if month_data.month == 1 %}January{% elif month_data.month == 2 %}February{% elif month_data.month == 3 %}March{% elif month_data.month == 4 %}April{% elif month_data.month == 5 %}May{% elif month_data.month == 6 %}June{% elif month_data.month == 7 %}July{% elif month_data.month == 8 %}August{% elif month_data.month == 9 %}September{% elif month_data.month == 10 %}October{% elif month_data.month == 11 %}November{% elif month_data.month == 12 %}December{% endif %} {{ month_data.year }}</span>
+                                </div>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div class="month-content">
+                                <div class="dates-list">
+                                    {% for date in month_data.matching %}
+                                        <div class="date-badge">{{ date }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="action-buttons">
+                                    <a href="{% url 'missingTicketDownload' name %}" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Download CSV
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-check-circle"></i></div>
+                    <p>All ticket records are complete! No missing data.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Missing Schedule Section -->
+        <div class="section">
+            <div class="section-header">
+                <i class="fas fa-calendar-alt section-icon"></i>
+                <div>
+                    <h2 class="section-title">Missing Schedule Data</h2>
+                    <p class="section-subtitle">Dates without opening/closing time information</p>
+                </div>
+            </div>
+
+            {% if schedmissing %}
+                <div class="months-container">
+                    {% for month_data in schedmissing %}
+                        <div class="month-group">
+                            <div class="month-header" onclick="toggleMonth(this)">
+                                <div class="month-title">
+                                    <span class="month-count">{{ month_data.matching|length }}</span>&nbsp;<span class="month-name">{% if month_data.month == 1 %}January{% elif month_data.month == 2 %}February{% elif month_data.month == 3 %}March{% elif month_data.month == 4 %}April{% elif month_data.month == 5 %}May{% elif month_data.month == 6 %}June{% elif month_data.month == 7 %}July{% elif month_data.month == 8 %}August{% elif month_data.month == 9 %}September{% elif month_data.month == 10 %}October{% elif month_data.month == 11 %}November{% elif month_data.month == 12 %}December{% endif %} {{ month_data.year }}</span>
+                                </div>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div class="month-content">
+                                <div class="dates-list">
+                                    {% for date in month_data.matching %}
+                                        <div class="date-badge">{{ date }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="action-buttons">
+                                    <a href="{% url 'missingScheduleDownload' name %}" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Download CSV
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-check-circle"></i></div>
+                    <p>All schedule data is complete! No missing information.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleMonth(header) {
+            const content = header.nextElementSibling;
+            const isActive = header.classList.contains('active');
+            
+            // Close all other open months
+            document.querySelectorAll('.month-header.active').forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            
+            // Toggle current month
+            if (isActive) {
+                header.classList.remove('active');
+                content.classList.remove('active');
+            } else {
+                header.classList.add('active');
+                content.classList.add('active');
+            }
+        }
+        
+    </script>
+    <!-- Back to Top Button -->
+<button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+    Back to Top
+</button>
+
+<script>
+    function toggleMonth(header) {
+        const content = header.nextElementSibling;
+        const isActive = header.classList.contains('active');
+        
+        // Close all other open months
+        document.querySelectorAll('.month-header.active').forEach(h => {
+            if (h !== header) {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            }
+        });
+        
+        // Toggle current month
+        if (isActive) {
+            header.classList.remove('active');
+            content.classList.remove('active');
+        } else {
+            header.classList.add('active');
+            content.classList.add('active');
+        }
+    }
+
+    // Back to Top 
+    const backToTopBtn = document.getElementById('backToTop');
+
+   
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+
+    // Scroll to top when button is clicked
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+</script>
+        <footer class="footer">
+        <p>&copy; 2025 Intramuros Analytics.</p>
+    </footer>
+</body>
+</html>
